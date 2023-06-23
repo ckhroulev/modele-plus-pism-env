@@ -7,6 +7,7 @@ RUN <<EOF
     binutils \
     cmake \
     coreutils \
+    curl \
     environment-modules \
     g++ \
     gcc \
@@ -29,7 +30,8 @@ USER builder
 
 # Install spack
 RUN <<EOF
-    git clone --depth=100 --branch=releases/v0.20 https://github.com/spack/spack.git ~/spack
+# The current version of spack (0.20) has a broken blitz package.
+    git clone --depth=100 --branch=releases/v0.19 https://github.com/spack/spack.git ~/spack
 
     . ~/spack/share/spack/setup-env.sh
     spack compiler find
@@ -38,60 +40,60 @@ EOF
 
 # OpenMPI
 RUN . ~/spack/share/spack/setup-env.sh; \
-    spack install openmpi@4.1.5
+    spack install openmpi@4.1.4
 
 # PETSc
 RUN . ~/spack/share/spack/setup-env.sh; \
-    spack install petsc@3.19.1+double+mpi+shared~fortran~hdf5~hypre~metis
+    spack install petsc@3.18.1+double+mpi+shared~fortran~hdf5~hypre~metis
 
-# ICEBIN dependencies
-RUN <<EOF
-    . ~/spack/share/spack/setup-env.sh
-    spack install \
-    boost@1.82.0+filesystem+date_time \
-    cgal@5.4.1 \
-    eigen@3.4.0 \
-    netcdf-cxx4@4.3.1 \
-    proj@4.9.2 \
-    zlib@1.2.13 \
-    ;
-EOF
+# # ICEBIN dependencies
+# RUN <<EOF
+#     . ~/spack/share/spack/setup-env.sh
+#     spack install \
+#     boost@1.82.0+filesystem+date_time \
+#     cgal@5.4.1 \
+#     eigen@3.4.0 \
+#     netcdf-cxx4@4.3.1 \
+#     proj@4.9.2 \
+#     zlib@1.2.13 \
+#     ;
+# EOF
 
-RUN <<EOF
-    . ~/spack/share/spack/setup-env.sh
-    spack install \
-    blitz@1.0.2 \
-    ;
-EOF
+# RUN <<EOF
+#     . ~/spack/share/spack/setup-env.sh
+#     spack install \
+#     blitz@1.0.2 \
+#     ;
+# EOF
 
-# PISM dependencies
-RUN <<EOF
-    . ~/spack/share/spack/setup-env.sh
-    spack install \
-    fftw@3.3.10+double~mpi \
-    gsl@2.7.1 \
-    netcdf-c@4.9.2 \
-    udunits@2.2.28 \
-    ;
-EOF
+# # PISM dependencies
+# RUN <<EOF
+#     . ~/spack/share/spack/setup-env.sh
+#     spack install \
+#     fftw@3.3.10+double~mpi \
+#     gsl@2.7.1 \
+#     netcdf-c@4.9.2 \
+#     udunits@2.2.28 \
+#     ;
+# EOF
 
 COPY <<EOF /home/builder/spack-setup.sh
 . ~/spack/share/spack/setup-env.sh
 spack load \\
-    blitz \\
-    boost \\
-    cgal \\
-    eigen \\
-    everytrace \\
-    gmp \\
-    ibmisc \\
-    mpfr \\
-    netcdf-cxx4 \\
     openmpi \\
-    petsc \\
-    proj \\
-    zlib \\
     ;
 EOF
+    # blitz \\
+    # boost \\
+    # cgal \\
+    # eigen \\
+    # everytrace \\
+    # gmp \\
+    # ibmisc \\
+    # mpfr \\
+    # netcdf-cxx4 \\
+    # petsc \\
+    # proj \\
+    # zlib \\
 
 RUN echo "source ~/spack-setup.sh" >> ~/.bashrc
