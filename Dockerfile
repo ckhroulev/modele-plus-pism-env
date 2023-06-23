@@ -46,25 +46,27 @@ RUN . ~/spack/share/spack/setup-env.sh; \
 RUN . ~/spack/share/spack/setup-env.sh; \
     spack install petsc@3.18.1+double+mpi+shared~fortran~hdf5~hypre~metis
 
-# # ICEBIN dependencies
-# RUN <<EOF
-#     . ~/spack/share/spack/setup-env.sh
-#     spack install \
-#     boost@1.82.0+filesystem+date_time \
-#     cgal@5.4.1 \
-#     eigen@3.4.0 \
-#     netcdf-cxx4@4.3.1 \
-#     proj@4.9.2 \
-#     zlib@1.2.13 \
-#     ;
-# EOF
+# ICEBIN dependencies
 
-# RUN <<EOF
-#     . ~/spack/share/spack/setup-env.sh
-#     spack install \
-#     blitz@1.0.2 \
-#     ;
-# EOF
+# blitz 1.0.2 is broken in both spack 0.19 and 0.20 and 0.20 does not
+# support Python 2.7. We have to tell spack to download a deprecated
+# version of Python to install blitz@1.0.1.
+RUN <<EOF
+    . ~/spack/share/spack/setup-env.sh
+    spack install --deprecated blitz@1.0.1
+EOF
+
+RUN <<EOF
+    . ~/spack/share/spack/setup-env.sh
+    spack install \
+    boost@1.80.0+filesystem+date_time \
+    cgal@5.4.1 \
+    eigen@3.4.0 \
+    netcdf-cxx4@4.3.1 \
+    proj@4.9.2 \
+    zlib@1.2.13 \
+    ;
+EOF
 
 # # PISM dependencies
 # RUN <<EOF
@@ -81,6 +83,14 @@ COPY <<EOF /home/builder/spack-setup.sh
 . ~/spack/share/spack/setup-env.sh
 spack load \\
     openmpi \\
+    petsc \\
+    blitz \\
+    boost \\
+    cgal \\
+    eigen \\
+    netcdf-cxx4 \\
+    proj \\
+    zlib \\
     ;
 EOF
     # blitz \\
