@@ -58,7 +58,7 @@ RUN <<EOF
     . ~/spack/share/spack/setup-env.sh
 
     spack install \
-    boost @1.80.0 +date_time +filesystem +mpi +program_options +regex +serialization +system +thread \
+    boost @1.82.0 +date_time +filesystem +mpi +program_options +regex +serialization +system +thread \
     cgal@5.4.1 \
     eigen@3.4.0 \
     everytrace@0.2.2 \
@@ -77,7 +77,7 @@ RUN <<EOF
 # This will bring in some icebin dependencies as well
     . ~/spack/share/spack/setup-env.sh
 
-    spack install --dependencies ibmisc@0.1.0
+    spack install --only dependencies ibmisc@0.1.0
 EOF
 
 RUN <<EOF
