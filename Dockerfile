@@ -74,7 +74,7 @@ RUN <<EOF
     spack install \
     fftw @3.3.10 precision=double ~mpi \
     gsl@2.7.1 \
-    netcdf-c@4.9.2 \
+    netcdf-c@4.9.0 \
     udunits@2.2.28 \
     ;
 EOF
