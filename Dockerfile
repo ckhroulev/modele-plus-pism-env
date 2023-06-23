@@ -30,53 +30,72 @@ USER builder
 
 # Install spack
 RUN <<EOF
-# The current version of spack (0.20) has a broken blitz package.
-    git clone --depth=100 --branch=releases/v0.19 https://github.com/spack/spack.git ~/spack
+# Install spack 0.20
+    git clone --depth=100 --branch=releases/v0.20 https://github.com/spack/spack.git ~/spack
 
     . ~/spack/share/spack/setup-env.sh
     spack compiler find
     spack external find
 EOF
 
-# OpenMPI
-RUN . ~/spack/share/spack/setup-env.sh; \
-    spack install openmpi@4.1.4
-
-# PETSc
-RUN . ~/spack/share/spack/setup-env.sh; \
-    spack install petsc@3.18.1+double+mpi+shared~fortran~hdf5~hypre~metis
-
-# ICEBIN dependencies
-
-# blitz 1.0.2 is broken in both spack 0.19 and 0.20 and 0.20 does not
-# support Python 2.7. We have to tell spack to download a deprecated
-# version of Python to install blitz@1.0.1.
 RUN <<EOF
+# Install OpenMPI
     . ~/spack/share/spack/setup-env.sh
-    spack install --deprecated blitz@1.0.1
+    spack install openmpi@4.1.5
 EOF
 
 RUN <<EOF
+# Install PETSc
     . ~/spack/share/spack/setup-env.sh
     spack install \
-    boost@1.80.0+filesystem+date_time \
+    petsc@3.19.1+double+mpi+shared~fortran~hdf5~hypre~metis \
+    ;
+EOF
+
+RUN <<EOF
+# Install icebin dependencies mentioned in its CMakeLists.txt (except
+# for MPI, PISM, PETSc, Blitz, ibmisc, Python, Cython, NumPy)
+    . ~/spack/share/spack/setup-env.sh
+
+    spack install \
+    boost @1.80.0 +date_time +filesystem +mpi +program_options +regex +serialization +system +thread \
     cgal@5.4.1 \
     eigen@3.4.0 \
+    everytrace@0.2.2 \
+    gmp@6.2.1 \
+    googletest@1.12.1 \
+    mpfr@4.2.0 \
     netcdf-cxx4@4.3.1 \
     proj@4.9.2 \
+    tclap@1.2.2 \
     zlib@1.2.13 \
     ;
 EOF
 
-# PISM dependencies
 RUN <<EOF
+# Install dependencies of ibmisc so we can build it later
+# This will bring in some icebin dependencies as well
+    . ~/spack/share/spack/setup-env.sh
+
+    spack install --dependencies ibmisc@0.1.0
+EOF
+
+RUN <<EOF
+# Install PISM dependencies
     . ~/spack/share/spack/setup-env.sh
     spack install \
     fftw @3.3.10 precision=double ~mpi \
     gsl@2.7.1 \
-    netcdf-c@4.9.0 \
+    netcdf-c@4.9.2 \
+    petsc@3.19.1+double+mpi+shared~fortran~hdf5~hypre~metis \
     udunits@2.2.28 \
     ;
+EOF
+
+RUN <<EOF
+# Create filesystem views (if absolutely necessary)
+    . ~/spack/share/spack/setup-env.sh
+    spack view symlink ~/local/cgal cgal
 EOF
 
 COPY <<EOF /home/builder/spack-setup.sh
@@ -85,7 +104,7 @@ spack load \\
     openmpi \\
     petsc \\
     blitz \\
-    boost@1.80.0+filesystem+date_time \\
+    boost \\
     cgal \\
     eigen \\
     netcdf-cxx4 \\
