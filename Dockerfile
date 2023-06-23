@@ -68,16 +68,16 @@ RUN <<EOF
     ;
 EOF
 
-# # PISM dependencies
-# RUN <<EOF
-#     . ~/spack/share/spack/setup-env.sh
-#     spack install \
-#     fftw@3.3.10+double~mpi \
-#     gsl@2.7.1 \
-#     netcdf-c@4.9.2 \
-#     udunits@2.2.28 \
-#     ;
-# EOF
+# PISM dependencies
+RUN <<EOF
+    . ~/spack/share/spack/setup-env.sh
+    spack install \
+    fftw @3.3.10 precision=double ~mpi \
+    gsl@2.7.1 \
+    netcdf-c@4.9.2 \
+    udunits@2.2.28 \
+    ;
+EOF
 
 COPY <<EOF /home/builder/spack-setup.sh
 . ~/spack/share/spack/setup-env.sh
@@ -85,7 +85,7 @@ spack load \\
     openmpi \\
     petsc \\
     blitz \\
-    boost \\
+    boost@1.80.0+filesystem+date_time \\
     cgal \\
     eigen \\
     netcdf-cxx4 \\
