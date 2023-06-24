@@ -121,7 +121,6 @@ COPY <<EOF /home/builder/spack-setup.sh
 spack load \\
     openmpi \\
     petsc \\
-    blitz \\
     boost \\
     cgal \\
     eigen \\
