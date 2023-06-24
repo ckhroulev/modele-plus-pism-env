@@ -36,6 +36,7 @@ RUN <<EOF
     . ~/spack/share/spack/setup-env.sh
     spack compiler find
     spack external find
+    spack config add config:connect_timeout:600
 EOF
 
 RUN <<EOF
@@ -91,6 +92,23 @@ RUN <<EOF
     udunits@2.2.28 \
     ;
 EOF
+
+RUN <<EOF
+#Install blitz
+    prefix=$HOME/local/blitz
+    build_dir=$HOME/local/build/blitz
+    mkdir -p ${build_dir}
+    cd ${build_dir}
+    git clone https://github.com/blitzpp/blitz.git .
+    git checkout -b release-1.0.2 1.0.2
+    mkdir build
+    cmake -DCMAKE_INSTALL_PREFIX=${prefix} \
+    -DCMAKE_BUILD_TYPE=Release \
+    -S . -B build
+    make -C build install
+EOF
+
+# Don't touch the stuff above this line!
 
 RUN <<EOF
 # Create filesystem views (if absolutely necessary)
