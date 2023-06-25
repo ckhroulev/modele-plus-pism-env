@@ -93,22 +93,15 @@ RUN <<EOF
     ;
 EOF
 
-RUN <<EOF
-#!/bin/bash -x
-prefix=~/local/blitz;
-src_dir=~/blitz;
-build_dir=${src_dir}/build;
-mkdir -p ${src_dir} ${build_dir};
-
-cd ${src_dir};
-git clone https://github.com/blitzpp/blitz.git .;
-git checkout -b release-1.0.2 1.0.2;
-
-    cmake -DCMAKE_INSTALL_PREFIX=${prefix} \
+RUN git clone https://github.com/blitzpp/blitz.git ~/blitz; \
+    cd ~/blitz; \
+    git checkout -b release-1.0.2 1.0.2; \
+    mkdir -p build; \
+    \
+    cmake -DCMAKE_INSTALL_PREFIX=~/local/blitz \
     -DCMAKE_BUILD_TYPE=Release \
-    -S ${scr_dir} \
-    -B ${build_dir}
-
-make -C ${build_dir} install
-rm -rf ${src_dir} ${build_dir}
-EOF
+    -S . \
+    -B build; \
+    make -C build install; \
+    \
+    rm -rf ~/blitz;
