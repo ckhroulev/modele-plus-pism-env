@@ -94,52 +94,21 @@ RUN <<EOF
 EOF
 
 RUN <<EOF
-#Install blitz
-    prefix=$HOME/local/blitz
-    build_dir=$HOME/local/build/blitz
-    mkdir -p ${build_dir}
-    cd ${build_dir}
-    git clone https://github.com/blitzpp/blitz.git .
-    git checkout -b release-1.0.2 1.0.2
-    mkdir build
+#!/bin/bash -x
+prefix=~/local/blitz;
+src_dir=~/blitz;
+build_dir=${src_dir}/build;
+mkdir -p ${src_dir} ${build_dir};
+
+cd ${src_dir};
+git clone https://github.com/blitzpp/blitz.git .;
+git checkout -b release-1.0.2 1.0.2;
+
     cmake -DCMAKE_INSTALL_PREFIX=${prefix} \
     -DCMAKE_BUILD_TYPE=Release \
-    -S . -B build
-    make -C build install
+    -S ${scr_dir} \
+    -B ${build_dir}
+
+make -C ${build_dir} install
+rm -rf ${src_dir} ${build_dir}
 EOF
-
-# Don't touch the stuff above this line!
-
-RUN <<EOF
-# Create filesystem views (if absolutely necessary)
-    . ~/spack/share/spack/setup-env.sh
-    spack view symlink ~/local/cgal cgal
-EOF
-
-COPY <<EOF /home/builder/spack-setup.sh
-. ~/spack/share/spack/setup-env.sh
-spack load \\
-    openmpi \\
-    petsc \\
-    boost \\
-    cgal \\
-    eigen \\
-    netcdf-cxx4 \\
-    proj \\
-    zlib \\
-    ;
-EOF
-    # blitz \\
-    # boost \\
-    # cgal \\
-    # eigen \\
-    # everytrace \\
-    # gmp \\
-    # ibmisc \\
-    # mpfr \\
-    # netcdf-cxx4 \\
-    # petsc \\
-    # proj \\
-    # zlib \\
-
-RUN echo "source ~/spack-setup.sh" >> ~/.bashrc
