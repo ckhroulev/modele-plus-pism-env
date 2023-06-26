@@ -115,10 +115,10 @@ RUN <<EOF
 EOF
 
 run <<EOF
-# Install ibmisc (requires Blitz which we had to install manually, so cannot be installed via spack)
+# Install ibmisc
     . ~/spack/share/spack/setup-env.sh
 
-    spack load udunits proj py-cython py-numpy googletest everytrace
+    spack load udunits proj py-cython py-numpy googletest everytrace eigen boost netcdf-cxx4
 
     git clone https://github.com/NASA-GISS/ibmisc.git ~/ibmisc
     cd ~/ibmisc/
@@ -129,7 +129,7 @@ run <<EOF
     -DCMAKE_INSTALL_PREFIX=~/local/ibmisc \
     -DCMAKE_BUILD_TYPE=Release \
     -DCMAKE_FIND_ROOT_PATH=~/local/blitz \
-    -DCMAKE_CXX_FLAGS=-fpermissive \
+    -DCMAKE_CXX_FLAGS="-fpermissive -w" \
     ;
 
     make -C build install
@@ -138,14 +138,23 @@ EOF
 
 COPY <<EOF /home/builder/spack-setup.sh
 . ~/spack/share/spack/setup-env.sh
-spack load \\
-    openmpi \\
-    petsc \\
-    boost @1.82.0 +date_time +filesystem +mpi +program_options +regex +serialization +system +thread \\
+
+    spack load \\
+    boost \\
     cgal \\
     eigen \\
+    everytrace \\
+    fftw \\
+    googletest \\
+    gsl \\
+    netcdf-c \\
     netcdf-cxx4 \\
+    openmpi \\
+    petsc \\
     proj \\
+    py-cython \\
+    py-numpy \\
+    udunits \\
     zlib \\
     ;
 EOF
