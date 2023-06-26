@@ -138,6 +138,17 @@ run <<EOF
     rm -rf ~/ibmisc
 EOF
 
+run <<EOF
+    # Set up symlinks to work around issues with the icebin build system
+    . ~/spack/share/spack/setup-env.sh
+
+    spack view symlink ~/local/spack \
+    netcdf-c \
+    netcdf-cxx4 \
+    udunits \
+    ;
+EOF
+
 COPY <<EOF /home/builder/spack-setup.sh
 . ~/spack/share/spack/setup-env.sh
 
@@ -156,6 +167,7 @@ COPY <<EOF /home/builder/spack-setup.sh
     proj \\
     py-cython \\
     py-numpy \\
+    tclap \\
     udunits \\
     zlib \\
     ;
