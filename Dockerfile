@@ -66,13 +66,26 @@ RUN <<EOF
 EOF
 
 RUN <<EOF
-# Install icebin dependencies mentioned in its CMakeLists.txt (except
-# for MPI, PISM, PETSc, Blitz, ibmisc, Python, Cython, NumPy)
+# Install Python, Cython, NumPy
     . ~/spack/share/spack/setup-env.sh
 
     spack install \
-    boost @1.82.0 +date_time +filesystem +mpi +program_options +regex +serialization +system +thread \
-    cgal@5.4.1 \
+    py-numpy \
+    ;
+EOF
+
+RUN <<EOF
+# Install icebin dependencies mentioned in its CMakeLists.txt (except
+# for MPI, PISM, PETSc, Blitz, ibmisc)
+# Some Boost libraries are required by ibmisc and icebin, others by CGAL.
+
+    . ~/spack/share/spack/setup-env.sh
+
+    boost="boost @1.82.0 +container +date_time +exception +filesystem +math +mpi +program_options +random +regex +serialization +system +thread"
+
+    spack install \
+    ${boost} \
+    cgal@5.4.1 ^eigen@3.2.8 ^${boost} \
     eigen@3.2.8 \
     everytrace@0.2.2 \
     gmp@6.2.1 \
@@ -83,17 +96,6 @@ RUN <<EOF
     tclap@1.2.2 \
     zlib@1.2.13 \
     ;
-EOF
-
-RUN <<EOF
-# Install dependencies of ibmisc so we can build it later
-# This will bring in some icebin dependencies as well
-    . ~/spack/share/spack/setup-env.sh
-
-    # Installation of Blitz 1.0.2 will fail, but that's okay.
-    spack install --only dependencies ibmisc@0.1.0 \
-    ^eigen@3.2.8 \
-    ^boost @1.82.0 +date_time +filesystem +mpi +program_options +regex +serialization +system +thread
 EOF
 
 RUN <<EOF
@@ -114,8 +116,9 @@ EOF
 
 run <<EOF
 # Install ibmisc (requires Blitz which we had to install manually, so cannot be installed via spack)
+    . ~/spack/share/spack/setup-env.sh
 
-    spack load udunits proj py-cython googletest everytrace
+    spack load udunits proj py-cython py-numpy googletest everytrace
 
     git clone https://github.com/NASA-GISS/ibmisc.git ~/ibmisc
     cd ~/ibmisc/
