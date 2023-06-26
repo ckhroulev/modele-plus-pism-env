@@ -2,6 +2,7 @@ FROM ubuntu:22.04
 ENV DEBIAN_FRONTEND=noninteractive
 
 RUN <<EOF
+# Install system packages
     apt-get update
     apt-get install -y \
     binutils \
@@ -16,6 +17,7 @@ RUN <<EOF
     bzip2 \
     make \
     pkgconf \
+    python2 \
     python3 \
     tar \
     xz-utils \
