@@ -54,6 +54,18 @@ RUN <<EOF
 EOF
 
 RUN <<EOF
+# Install PISM dependencies
+    . ~/spack/share/spack/setup-env.sh
+    spack install \
+    fftw @3.3.10 precision=double ~mpi \
+    gsl@2.7.1 \
+    netcdf-c@4.9.2 \
+    petsc@3.19.1+double+mpi+shared~fortran~hdf5~hypre~metis \
+    udunits@2.2.28 \
+    ;
+EOF
+
+RUN <<EOF
 # Install icebin dependencies mentioned in its CMakeLists.txt (except
 # for MPI, PISM, PETSc, Blitz, ibmisc, Python, Cython, NumPy)
     . ~/spack/share/spack/setup-env.sh
@@ -61,7 +73,7 @@ RUN <<EOF
     spack install \
     boost @1.82.0 +date_time +filesystem +mpi +program_options +regex +serialization +system +thread \
     cgal@5.4.1 \
-    eigen@3.4.0 \
+    eigen@3.2.8 \
     everytrace@0.2.2 \
     gmp@6.2.1 \
     googletest@1.12.1 \
@@ -78,19 +90,10 @@ RUN <<EOF
 # This will bring in some icebin dependencies as well
     . ~/spack/share/spack/setup-env.sh
 
-    spack install --only dependencies ibmisc@0.1.0
-EOF
-
-RUN <<EOF
-# Install PISM dependencies
-    . ~/spack/share/spack/setup-env.sh
-    spack install \
-    fftw @3.3.10 precision=double ~mpi \
-    gsl@2.7.1 \
-    netcdf-c@4.9.2 \
-    petsc@3.19.1+double+mpi+shared~fortran~hdf5~hypre~metis \
-    udunits@2.2.28 \
-    ;
+    # Installation of Blitz 1.0.2 will fail, but that's okay.
+    spack install --only dependencies ibmisc@0.1.0 \
+    ^eigen@3.2.8 \
+    ^boost @1.82.0 +date_time +filesystem +mpi +program_options +regex +serialization +system +thread
 EOF
 
 RUN <<EOF
@@ -108,3 +111,41 @@ RUN <<EOF
 
     rm -rf ~/blitz;
 EOF
+
+run <<EOF
+# Install ibmisc (requires Blitz which we had to install manually, so cannot be installed via spack)
+
+    spack load udunits proj py-cython googletest everytrace
+
+    git clone https://github.com/NASA-GISS/ibmisc.git ~/ibmisc
+    cd ~/ibmisc/
+    git checkout mankoff/nospack
+
+    mkdir build
+    cmake -S . -B build \
+    -DCMAKE_INSTALL_PREFIX=~/local/ibmisc \
+    -DCMAKE_BUILD_TYPE=Release \
+    -DCMAKE_FIND_ROOT_PATH=~/local/blitz \
+    -DCMAKE_CXX_FLAGS=-fpermissive \
+    ;
+
+    make -C build install
+    rm -rf ~/ibmisc
+EOF
+
+COPY <<EOF /home/builder/spack-setup.sh
+. ~/spack/share/spack/setup-env.sh
+spack load \\
+    openmpi \\
+    petsc \\
+    boost @1.82.0 +date_time +filesystem +mpi +program_options +regex +serialization +system +thread \\
+    cgal \\
+    eigen \\
+    netcdf-cxx4 \\
+    proj \\
+    zlib \\
+    ;
+EOF
+
+RUN echo "source ~/spack-setup.sh" >> ~/.bashrc
+RUN echo "cd ~" >> ~/.bashrc
