@@ -102,18 +102,16 @@ EOF
 
 RUN <<EOF
 # Install Blitz
-    git clone https://github.com/blitzpp/blitz.git ~/blitz;
-    cd ~/blitz;
-    git checkout -b release-1.0.2 1.0.2;
-    mkdir -p build;
+    git clone -b 1.0.2 https://github.com/blitzpp/blitz.git ~/blitz
+    mkdir -p ~/blitz/build
 
-    cmake -DCMAKE_INSTALL_PREFIX=~/local/blitz \
+    cmake -S ~/blitz -B ~/blitz/build \
+    -DCMAKE_INSTALL_PREFIX=~/local/blitz \
     -DCMAKE_BUILD_TYPE=Release \
-    -S . \
-    -B build;
-    make -C build install;
+    ;
 
-    rm -rf ~/blitz;
+    make -C ~/blitz/build install
+    rm -rf ~/blitz
 EOF
 
 run <<EOF
@@ -122,19 +120,17 @@ run <<EOF
 
     spack load udunits proj py-cython py-numpy googletest everytrace eigen boost netcdf-cxx4
 
-    git clone https://github.com/NASA-GISS/ibmisc.git ~/ibmisc
-    cd ~/ibmisc/
-    git checkout mankoff/nospack
+    git clone -b mankoff/nospack https://github.com/NASA-GISS/ibmisc.git ~/ibmisc
+    mkdir -p ~/ibmisc/build
 
-    mkdir build
-    cmake -S . -B build \
+    cmake -S ~/ibmisc -B ~/ibmisc/build \
     -DCMAKE_INSTALL_PREFIX=~/local/ibmisc \
     -DCMAKE_BUILD_TYPE=Release \
     -DCMAKE_FIND_ROOT_PATH=~/local/blitz \
     -DCMAKE_CXX_FLAGS="-fpermissive -w" \
     ;
 
-    make -C build install
+    make -C ~/ibmisc/build install
     rm -rf ~/ibmisc
 EOF
 
