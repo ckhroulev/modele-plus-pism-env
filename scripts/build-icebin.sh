@@ -7,7 +7,7 @@ mkdir -p ${BUILD_DIR}
 rm -f ${BUILD_DIR}/CMakeCache.txt
 
 # ibmisc headers are full of these...
-IGNORED_WARNINGS="-Wno-ignored-attributes -Wno-narrowing -Wno-vexing-parse -Wno-return-type -Wno-deprecated-declarations"
+IGNORED_WARNINGS="-Wno-ignored-attributes -Wno-narrowing -Wno-vexing-parse -Wno-return-type -Wno-deprecated-declarations -Wno-format"
 
 cmake -S ${ICEBIN_DIR} -B ${BUILD_DIR} \
       -DCMAKE_CXX_FLAGS="${IGNORED_WARNINGS}" \
