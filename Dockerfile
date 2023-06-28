@@ -135,16 +135,30 @@ run <<EOF
 EOF
 
 run <<EOF
-    # Set up symlinks to work around issues with the icebin build system
+# Install netcdf-fortran and curl for modelE
+    . ~/spack/share/spack/setup-env.sh
+
+    spack install \
+    netcdf-fortran@4.6.0 ^netcdf-c@4.9.2 \
+    curl@8.0.1 \
+    ;
+
+# ModelE seems to think that if you happen to have libhdf5 in your lib
+# directory then you have to link to libcurl. :-{}
+EOF
+
+run <<EOF
+    # Set up symlinks to work around some build system issues
     . ~/spack/share/spack/setup-env.sh
 
     spack view symlink ~/local/spack \
+    curl \
     netcdf-c \
     netcdf-cxx4 \
+    netcdf-fortran \
+    openmpi \
     udunits \
     ;
-
-    spack view symlink ~/local/openmpi openmpi
 EOF
 
 COPY <<EOF /home/builder/spack-setup.sh
