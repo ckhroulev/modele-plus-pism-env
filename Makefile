@@ -1,6 +1,7 @@
 IMAGE=ckhrulev/icebin-env:0.0.1
 ICEBIN=${PWD}/../icebin
 PISM=${PWD}/../pism
+MODELE=${PWD}/../modelE
 SCRIPTS=${PWD}/scripts
 
 run: build
@@ -9,6 +10,7 @@ run: build
 		-it \
 		-v ${ICEBIN}:/home/builder/icebin \
 		-v ${PISM}:/home/builder/pism \
+		-v ${MODELE}:/home/builder/modele \
 		-v ${SCRIPTS}:/home/builder/scripts \
 		${IMAGE} \
 		bash

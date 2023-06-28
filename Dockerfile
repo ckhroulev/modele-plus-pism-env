@@ -143,6 +143,8 @@ run <<EOF
     netcdf-cxx4 \
     udunits \
     ;
+
+    spack view symlink ~/local/openmpi openmpi
 EOF
 
 COPY <<EOF /home/builder/spack-setup.sh
