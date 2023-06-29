@@ -13,18 +13,12 @@ icebin.nc: icebin.cdl.template
 rundeck.R: rundeck.R.template
 	cat $^  | envsubst > $@
 
-# files mentioned in icebin.cdl.template
-INPUTS=pism_Greenland_5km_v1.1.nc g20km_10ka.nc global_ecO_ng.nc topoo_ng.nc gcmO.nc topoa.nc
-
-${INPUTS}:
-	mkdir -p ./inputs
-	cp ${DATA_DIR}/inputs/$@ ./inputs/$@
-
 clean:
 	rm -f rundeck.R
 	rm -f icebin.nc
 	rm -rf ./prod_input_files
-	rm -rf ./inputs
+
+INPUTS=pism_Greenland_5km_v1.1.nc g20km_10ka.nc global_ecO_ng.nc topoo_ng.nc gcmO.nc topoa.nc GIC
 
 ARCHIVED=\
 CD144X90.ext.nc \
@@ -72,6 +66,10 @@ soilcarb_top30cm_2x2.5.nc \
 solar.CMIP6official.ann1850-2299_with_E3_fastJ.nc \
 top_index_144x90_a.ij.ext.nc \
 topcld.trscat8
+
+${INPUTS}:
+	mkdir -p ./prod_input_files/inputs
+	cp ${DATA_DIR}/inputs/$@ ./prod_input_files/inputs/$@
 
 ${ARCHIVED} : ${DATA_DIR}/prod_input_files.zip
 	unzip -n $^ prod_input_files/$@
