@@ -1,7 +1,10 @@
 #!/bin/bash
 
-ICEBIN_DIR=~/icebin
-BUILD_DIR=~/icebin-build
+set -e
+set -x
+set -u
+
+BUILD_DIR=~/local/build/icebin
 
 mkdir -p ${BUILD_DIR}
 rm -f ${BUILD_DIR}/CMakeCache.txt

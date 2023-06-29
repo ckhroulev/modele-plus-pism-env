@@ -1,19 +1,19 @@
 IMAGE=ckhrulev/icebin-env:0.0.1
 
-ICEBIN ?= ${PWD}/../icebin
-PISM ?= ${PWD}/../pism
-MODELE ?= ${PWD}/../modelE
+ICEBIN_DIR ?= ${PWD}/../icebin
+PISM_DIR ?= ${PWD}/../pism
+MODELE_DIR ?= ${PWD}/../modelE
 
-SCRIPTS = ${PWD}/scripts
+SCRIPTS_DIR = ${PWD}/scripts
 
 run: build
 	docker run \
 		--rm \
 		-it \
-		-v ${ICEBIN}:/opt/icebin -e ICEBIN_DIR=/opt/icebin \
-		-v ${PISM}:/opt/pism -e PISM_DIR=/opt/pism \
-		-v ${MODELE}:/opt/modele -e MODELE_DIR=/opt/modele \
-		-v ${SCRIPTS}:/opt/scripts -e SCRIPTS_DIR=/opt/scripts \
+		-v ${ICEBIN_DIR}:/opt/icebin -e ICEBIN_DIR=/opt/icebin \
+		-v ${PISM_DIR}:/opt/pism -e PISM_DIR=/opt/pism \
+		-v ${MODELE_DIR}:/opt/modele -e MODELE_DIR=/opt/modele \
+		-v ${SCRIPTS_DIR}:/opt/scripts -e SCRIPTS_DIR=/opt/scripts \
 		${IMAGE} \
 		bash
 

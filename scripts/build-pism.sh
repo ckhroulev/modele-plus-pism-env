@@ -1,8 +1,13 @@
 #!/bin/bash
 
-PISM_DIR=$HOME/pism
+set -e
+set -u
+set -x
+
+# The variable PISM_DIR should point to PISM's source tree.
+
 PREFIX=$HOME/local/pism
-BUILD_DIR=$HOME/pism-build
+BUILD_DIR=$HOME/build/pism
 
 # git clone -b mankoff/pism-upgrade https://github.com/NASA-GISS/pism.git ${PISM_DIR} || true
 
