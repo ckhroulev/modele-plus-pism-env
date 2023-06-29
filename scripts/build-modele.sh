@@ -24,7 +24,10 @@ make config ModelE_Support=${MODELE_SUPPORT} SHELL=/bin/bash OVERWRITE=YES
 echo "COMPILER=gfortran" >> ~/.modelErc
 echo "MPIDISTR=openmpi" >> ~/.modelErc
 echo "MPIDIR=$HOME/local/spack" >> ~/.modelErc
-echo "GCMSEARCHPATH=${MODELE_STAGING_DIR}" >> ~/.modelErc
+
+# create symlinks
+rm -rf ${MODELE_SUPPORT}/prod_input_files/
+ln -s ${MODELE_STAGING_DIR}/prod_input_files/ ${MODELE_SUPPORT}/
 
 RUNNAME=r01
 
