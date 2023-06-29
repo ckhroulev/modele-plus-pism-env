@@ -1,6 +1,6 @@
 export INPUT_DIR ?= ${PWD}
 export OUTPUT_DIR ?= ${HOME}/modele_output
-DATA_DIR ?= ~/modele_data
+DATA_DIR ?= ${HOME}/modele_data
 
 # files mentioned in icebin.cdl.template
 INPUTS=pism_Greenland_5km_v1.1.nc g20km_10ka.nc global_ecO_ng.nc topoo_ng.nc gcmO.nc

@@ -4,7 +4,7 @@ set -x
 set -e
 set -u
 
-echo "Using ModelE in ${MODELE_DIR}..."
+echo "Using ModelE in ${MODELE_DIR} and data in ${MODELE_STAGING_DIR}..."
 
 MODELE_BUILD=~/local/modele
 MODELE_SUPPORT=~/modele-support
@@ -12,7 +12,7 @@ MODELE_SUPPORT=~/modele-support
 rm -rf ${MODELE_BUILD}
 mkdir -p ${MODELE_BUILD}
 # make a copy of ModelE sources to simulate "out of source" building
-cp -r ${MODELE_DIR} ${MODELE_BUILD}
+cp -r ${MODELE_DIR}/* ${MODELE_BUILD}
 
 cd ${MODELE_BUILD}/decks
 
@@ -25,9 +25,9 @@ echo "COMPILER=gfortran" >> ~/.modelErc
 echo "MPIDISTR=openmpi" >> ~/.modelErc
 echo "MPIDIR=$HOME/local/spack" >> ~/.modelErc
 
-cp ~/modele_data/rundeck.R .
-
 RUNNAME=r01
+
+cp ${MODELE_STAGING_DIR}/rundeck.R ./${RUNNAME}.R
 
 make -j setup \
   RUN=${RUNNAME}  \
