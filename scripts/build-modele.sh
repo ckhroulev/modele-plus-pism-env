@@ -34,6 +34,8 @@ make -j setup \
   MPI=YES \
   COMPILE_WITH_TRAPS=NO \
   NETCDFHOME=$HOME/local/spack \
+  PNETCDFHOME=$HOME/local/spack \
+  LILIBSDIR=$HOME/local/icebin \
   EXTRA_FFLAGS="-O0 -ggdb3 -fwrapv -fallow-argument-mismatch -fallow-invalid-boz" \
   EXTRA_LFLAGS="-O0 -ggdb3"  \
   2>&1 | tee ${MODELE_BUILD}/${RUNNAME}.compile.out
