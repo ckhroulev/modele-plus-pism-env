@@ -140,6 +140,7 @@ run <<EOF
 
     spack install \
     netcdf-fortran@4.6.0 ^netcdf-c@4.9.2 \
+    parallel-netcdf@1.12.3 +fortran ~cxx \
     curl@8.0.1 \
     ;
 
@@ -157,6 +158,7 @@ run <<EOF
     netcdf-cxx4 \
     netcdf-fortran \
     openmpi \
+    parallel-netcdf \
     udunits \
     ;
 EOF
