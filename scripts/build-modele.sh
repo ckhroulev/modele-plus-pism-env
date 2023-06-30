@@ -42,4 +42,14 @@ make -j setup \
   LILIBSDIR=$HOME/local/icebin \
   EXTRA_FFLAGS="-O0 -ggdb3 -fwrapv -fallow-argument-mismatch -fallow-invalid-boz" \
   EXTRA_LFLAGS="-O0 -ggdb3"  \
-  2>&1 | tee ${MODELE_BUILD}/${RUNNAME}.compile.out
+  2>&1 | tee ${MODELE_BUILD}/${RUNNAME}.compile.log
+
+# generate the icebin.nc config file
+mkdir -p ${RUNNAME}/config
+export INPUT_DIR=${MODELE_SUPPORT}/prod_input_files/inputs
+export OUTPUT_DIR=${MODELE_SUPPORT}/huge_space/${RUNNAME}
+cat ${MODELE_STAGING_DIR}/icebin.cdl.template | \
+  envsubst | \
+  ncgen -o ${RUNNAME}/config/icebin.nc -
+unset INPUT_DIR
+unset OUTPUT_DIR
