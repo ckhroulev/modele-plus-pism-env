@@ -190,3 +190,7 @@ EOF
 RUN echo "source ~/spack-setup.sh" >> ~/.bashrc
 RUN echo "cd ~" >> ~/.bashrc
 RUN echo "git config --global --add safe.directory /home/builder/pism" >> ~/.bashrc
+
+USER root
+RUN apt-get update && apt-get install -y strace
+USER builder
