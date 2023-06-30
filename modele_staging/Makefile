@@ -10,9 +10,6 @@ container:
 icebin.nc: icebin.cdl.template
 	cat $^  | envsubst | ncgen -o $@ -
 
-rundeck.R: rundeck.R.template
-	cat $^  | envsubst > $@
-
 clean:
 	rm -f rundeck.R
 	rm -f icebin.nc
