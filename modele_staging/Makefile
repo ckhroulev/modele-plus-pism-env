@@ -1,18 +1,8 @@
-export INPUT_DIR ?= ${PWD}
-export OUTPUT_DIR ?= ${HOME}/modele_output
 DATA_DIR ?= ${HOME}/modele_data
 
-local: inputs icebin.nc rundeck.R
-
-container:
-	${MAKE} -C . INPUT_DIR=/home/builder/modele_data OUTPUT_DIR=/home/builder/modele_output
-
-icebin.nc: icebin.cdl.template
-	cat $^  | envsubst | ncgen -o $@ -
+all: inputs rundeck.R icebin.cdl.template
 
 clean:
-	rm -f rundeck.R
-	rm -f icebin.nc
 	rm -rf ./prod_input_files
 
 INPUTS=pism_Greenland_5km_v1.1.nc g20km_10ka.nc global_ecO_ng.nc topoo_ng.nc gcmO.nc topoa.nc GIC
