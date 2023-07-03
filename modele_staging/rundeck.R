@@ -21,6 +21,8 @@ Preprocessor Options
 #define NO_HDIURN                ! exclude hdiurn diagnostics
 #define MODIS_LAI
 #define NEW_BCdalbsn
+#define LIPLUGGABLE
+#define USE_ICEBIN
 End Preprocessor Options
 
 Object modules:
@@ -64,7 +66,7 @@ IRRIGMOD                            ! irrigation module
 ATURB                               ! turbulence in whole atmosphere
 LAKES_COM LAKES                     ! lake modules
 SEAICE SEAICE_DRV                   ! seaice modules
-LANDICE LANDICE_COM LANDICE_IO LANDICE_IO_SUBS LANDICE_DRV LANDICE_DIAG     ! land ice modules
+LANDICE LANDICE_COM LANDICE_IO LANDICE_IO_SUBS LANDICE_DRV LANDICE_DIAG LISnow LISheetIceBin ! land ice modules
 ICEDYN_DRV ICEDYN                   ! ice dynamics modules
 RAD_COM RAD_DRV RADIATION           ! radiation modules
 RAD_UTILS ALBEDO READ_AERO ocalbedo ! radiation and albedo
