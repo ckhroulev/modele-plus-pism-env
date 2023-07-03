@@ -21,6 +21,7 @@ cmake -S ${PISM_DIR} -B ${BUILD_DIR} \
   -DCMAKE_INSTALL_PREFIX=${PREFIX} \
   -DPism_USE_EVERYTRACE=TRUE \
   -DPism_BUILD_ICEBIN=TRUE \
+  -DCMAKE_BUILD_TYPE=Debug \
   ;
 
 make -j8 -C ${BUILD_DIR} install
