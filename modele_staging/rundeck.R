@@ -85,7 +85,7 @@ lipluggable
 
 Component Options:
 OPTS_Ent = ONLINE=YES PS_MODEL=FBB PFT_MODEL=ENT !/* needed for "Ent" only */
-OPTS_dd2d = NC_IO=PNETCDF
+!OPTS_dd2d = NC_IO=PNETCDF
 
 Data input files:
 ! ---------- BEGIN #include b'/gpfsm/dnb53/laroach1/harn/twh/modelE/templates/IC_144x90_input_files'
