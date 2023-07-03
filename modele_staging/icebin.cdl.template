@@ -15,7 +15,7 @@ variables:
 	double m.greenland.modele ;
 		m.greenland.modele:coupling_type = "DIRICHLET_BC" ;
 	double m.greenland.pism ;
-                m.greenland.pism:skip = "None" ;
+                m.greenland.pism:skip = "True" ;
                 m.greenland.pism:skip_max = "10" ;
                 m.greenland.pism:surface = "given" ;
                 m.greenland.pism:calving = "ocean_kill" ;
