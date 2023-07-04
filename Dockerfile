@@ -115,26 +115,6 @@ RUN <<EOF
 EOF
 
 run <<EOF
-# Install ibmisc
-    . ~/spack/share/spack/setup-env.sh
-
-    spack load udunits proj py-cython py-numpy googletest everytrace eigen boost netcdf-cxx4
-
-    git clone -b mankoff/nospack https://github.com/NASA-GISS/ibmisc.git ~/ibmisc
-    mkdir -p ~/ibmisc/build
-
-    cmake -S ~/ibmisc -B ~/ibmisc/build \
-    -DCMAKE_INSTALL_PREFIX=~/local/ibmisc \
-    -DCMAKE_BUILD_TYPE=Debug \
-    -DCMAKE_FIND_ROOT_PATH=~/local/blitz \
-    -DCMAKE_CXX_FLAGS="-fpermissive -w" \
-    ;
-
-    make -C ~/ibmisc/build install
-    rm -rf ~/ibmisc
-EOF
-
-run <<EOF
 # Install netcdf-fortran and curl for modelE
     . ~/spack/share/spack/setup-env.sh
 
@@ -147,6 +127,11 @@ run <<EOF
 # ModelE seems to think that if you happen to have libhdf5 in your lib
 # directory then you have to link to libcurl. :-{}
 EOF
+
+# Install debugging tools
+USER root
+RUN apt-get update && apt-get install -y gdb valgrind libc6-dbg
+USER builder
 
 run <<EOF
     # Set up symlinks to work around some build system issues
@@ -187,10 +172,13 @@ COPY <<EOF /home/builder/spack-setup.sh
     ;
 EOF
 
-RUN echo "source ~/spack-setup.sh" >> ~/.bashrc
-RUN echo "cd ~" >> ~/.bashrc
-RUN echo "git config --global --add safe.directory /home/builder/pism" >> ~/.bashrc
+# Tell Git that /opt/pism is safe (used by PISM's build system to get PISM's version)
+RUN echo "git config --global --add safe.directory /opt/pism" >> ~/.bashrc
 
-USER root
-RUN apt-get update && apt-get install -y strace valgrind libc6-dbg
-USER builder
+# Load Spack
+RUN echo "source ~/spack-setup.sh" >> ~/.bashrc
+
+# Tell everyone where libicebin.so is (needed to run ModelE with icebin)
+RUN echo "export LD_LIBRARY_PATH=$HOME/local/icebin/lib" >> ~/.bashrc
+
+RUN echo "cd ~" >> ~/.bashrc
