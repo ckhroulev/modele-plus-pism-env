@@ -125,7 +125,7 @@ run <<EOF
 
     cmake -S ~/ibmisc -B ~/ibmisc/build \
     -DCMAKE_INSTALL_PREFIX=~/local/ibmisc \
-    -DCMAKE_BUILD_TYPE=Release \
+    -DCMAKE_BUILD_TYPE=Debug \
     -DCMAKE_FIND_ROOT_PATH=~/local/blitz \
     -DCMAKE_CXX_FLAGS="-fpermissive -w" \
     ;
