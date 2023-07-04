@@ -18,7 +18,6 @@ variables:
                 m.greenland.pism:skip = "True" ;
                 m.greenland.pism:skip_max = "10" ;
                 m.greenland.pism:surface = "given" ;
-                m.greenland.pism:calving = "ocean_kill" ;
                 m.greenland.pism:sia_e = "3.0" ;
                 m.greenland.pism:grid.recompute_longitude_and_latitude = "False";
                 m.greenland.pism:extra_vars = "diffusivity,temppabase,tempicethk_basal,bmelt,tillwat,velsurf_mag,mask,thk,topg,usurf,climatic_mass_balance,ice_surface_temp,csurf" ;
