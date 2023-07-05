@@ -173,7 +173,7 @@ COPY <<EOF /home/builder/spack-setup.sh
 EOF
 
 # Tell Git that /opt/pism is safe (used by PISM's build system to get PISM's version)
-RUN echo "git config --global --add safe.directory /opt/pism" >> ~/.bashrc
+RUN git config --global --add safe.directory /opt/pism
 
 # Load Spack
 RUN echo "source ~/spack-setup.sh" >> ~/.bashrc
