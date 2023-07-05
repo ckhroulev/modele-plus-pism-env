@@ -65,7 +65,7 @@ RUN <<EOF
     spack install \
     fftw @3.3.10 precision=double ~mpi \
     gsl@2.7.1 \
-    netcdf-c@4.4.0 \
+    netcdf-c@4.9.2 \
     petsc@3.19.1+double+mpi+shared~fortran~hdf5~hypre~metis \
     udunits@2.2.28 \
     ;
@@ -107,7 +107,7 @@ RUN <<EOF
     googletest@1.12.1 \
     mpfr@4.2.0 \
     netcdf-cxx4@4.3.1 \
-    netcdf-fortran@4.4.4 ^netcdf-c@4.4.0 \
+    netcdf-fortran@4.6.0 ^netcdf-c@4.9.2 \
     parallel-netcdf@1.12.3 +fortran ~cxx \
     proj@4.9.2 \
     tclap@1.2.2 \
