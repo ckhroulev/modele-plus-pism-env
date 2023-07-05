@@ -6,20 +6,24 @@ RUN <<EOF
     apt-get update
     apt-get install -y \
     binutils \
+    bzip2 \
     cmake \
     coreutils \
     curl \
     environment-modules \
     g++ \
     gcc \
+    gdb \
     gfortran \
     git \
-    bzip2 \
+    libc6-dbg \
     make \
     pkgconf \
     python2 \
     python3 \
     tar \
+    valgrind \
+    vim \
     xz-utils \
     ;
 # Clean up to reduce the image size:
@@ -69,6 +73,10 @@ EOF
 
 RUN <<EOF
 # Install Python, Cython, NumPy
+#
+# (here NumPy depends on Cython; *not* listing Cython lets me avoid
+# installing *two* versions of it: one required by NumPy and the other
+# requested explicitly)
     . ~/spack/share/spack/setup-env.sh
 
     spack install \
@@ -77,9 +85,13 @@ RUN <<EOF
 EOF
 
 RUN <<EOF
-# Install icebin dependencies mentioned in its CMakeLists.txt (except
-# for MPI, PISM, PETSc, Blitz, ibmisc)
-# Some Boost libraries are required by ibmisc and icebin, others by CGAL.
+# Install some icebin and ModelE dependencies
+#
+# Note: some Boost libraries are required by ibmisc and icebin, others
+# by CGAL.
+#
+# ModelE seems to think that if you happen to have libhdf5 in your lib
+# directory then you have to link to libcurl. :-{}
 
     . ~/spack/share/spack/setup-env.sh
 
@@ -88,12 +100,15 @@ RUN <<EOF
     spack install \
     ${boost} \
     cgal@4.12 ^eigen@3.3.1 ^${boost} \
+    curl@8.0.1 \
     eigen@3.3.1 \
     everytrace@0.2.2 \
     gmp@6.2.1 \
     googletest@1.12.1 \
     mpfr@4.2.0 \
     netcdf-cxx4@4.3.1 \
+    netcdf-fortran@4.4.4 ^netcdf-c@4.4.0 \
+    parallel-netcdf@1.12.3 +fortran ~cxx \
     proj@4.9.2 \
     tclap@1.2.2 \
     zlib@1.2.13 \
@@ -113,25 +128,6 @@ RUN <<EOF
     make -C ~/blitz/build install
     rm -rf ~/blitz
 EOF
-
-run <<EOF
-# Install netcdf-fortran and curl for modelE
-    . ~/spack/share/spack/setup-env.sh
-
-    spack install \
-    netcdf-fortran@4.4.4 ^netcdf-c@4.4.0 \
-    parallel-netcdf@1.12.3 +fortran ~cxx \
-    curl@8.0.1 \
-    ;
-
-# ModelE seems to think that if you happen to have libhdf5 in your lib
-# directory then you have to link to libcurl. :-{}
-EOF
-
-# Install debugging tools
-USER root
-RUN apt-get update && apt-get install -y gdb valgrind libc6-dbg
-USER builder
 
 run <<EOF
     # Set up symlinks to work around some build system issues
