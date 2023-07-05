@@ -9,8 +9,6 @@ set -x
 PREFIX=$HOME/local/pism
 BUILD_DIR=$HOME/build/pism
 
-# git clone -b mankoff/pism-upgrade https://github.com/NASA-GISS/pism.git ${PISM_DIR} || true
-
 mkdir -p ${BUILD_DIR}
 rm -f ${BUILD_DIR}/CMakeCache.txt
 
