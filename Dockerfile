@@ -61,7 +61,7 @@ RUN <<EOF
     spack install \
     fftw @3.3.10 precision=double ~mpi \
     gsl@2.7.1 \
-    netcdf-c@4.9.2 \
+    netcdf-c@4.4.0 \
     petsc@3.19.1+double+mpi+shared~fortran~hdf5~hypre~metis \
     udunits@2.2.28 \
     ;
@@ -87,8 +87,8 @@ RUN <<EOF
 
     spack install \
     ${boost} \
-    cgal@5.4.1 ^eigen@3.2.8 ^${boost} \
-    eigen@3.2.8 \
+    cgal@4.12 ^eigen@3.3.1 ^${boost} \
+    eigen@3.3.1 \
     everytrace@0.2.2 \
     gmp@6.2.1 \
     googletest@1.12.1 \
@@ -119,7 +119,7 @@ run <<EOF
     . ~/spack/share/spack/setup-env.sh
 
     spack install \
-    netcdf-fortran@4.6.0 ^netcdf-c@4.9.2 \
+    netcdf-fortran@4.4.4 ^netcdf-c@4.4.0 \
     parallel-netcdf@1.12.3 +fortran ~cxx \
     curl@8.0.1 \
     ;
