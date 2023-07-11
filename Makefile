@@ -6,7 +6,7 @@ PISM_DIR ?= ${PWD}/../pism
 MODELE_DIR ?= ${PWD}/../modelE
 
 MODELE_STAGING_DIR ?= ${PWD}/modele_staging
-SCRIPTS_DIR = ${PWD}/scripts
+SCRIPTS_DIR ?= ${PWD}/scripts
 
 run: build
 	docker run \
