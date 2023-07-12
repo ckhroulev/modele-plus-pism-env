@@ -1,0 +1,251 @@
+#+title: PISM-IceBin-ModelE development environment
+
+* Create a basic development environment
+
+  Versions used here should not matter very much. Compiler versions
+  _might_, though.
+
+  Note that =python3= is needed to run Spack and =python2= is needed
+  to build IceBin (=ibmisc= has a Python 2.x script that generates
+  some code). Spack no longer supports Python 2.x, so this has to come
+  from a system package.
+
+  Some of these packages are very much optional.
+
+#+name: basic-dev-environment
+#+begin_src bash
+  #!/bin/bash
+
+  set -e
+  set -u
+  set -x
+
+  export DEBIAN_FRONTEND=noninteractive
+
+  # Install system packages
+  apt-get update
+  apt-get install -y \
+          binutils \
+          bzip2 \
+          cmake \
+          coreutils \
+          curl \
+          environment-modules \
+          g++ \
+          gcc \
+          gdb \
+          gfortran \
+          git \
+          libc6-dbg \
+          make \
+          pkgconf \
+          python2 \
+          python3 \
+          tar \
+          valgrind \
+          vim \
+          xz-utils
+
+  apt-get autoremove -y
+  apt-get clean -y
+  rm -rf /var/lib/apt/lists/*
+#+end_src
+
+* Install Spack and create an environment
+
+  Here we increase the timeout to make Spack wait for slow servers
+  (most likely GNU).
+  
+#+name: install-spack
+#+begin_src bash
+  # Install spack 0.20
+  git clone --depth=100 --branch=releases/v0.20 https://github.com/spack/spack.git ~/spack
+
+  . ~/spack/share/spack/setup-env.sh
+  spack compiler find
+  spack external find
+  spack config add config:connect_timeout:600
+
+  mkdir -p ~/pism-modele-env
+  spack env create -d ~/pism-modele-env
+#+end_src
+
+* Install most dependencies using Spack
+
+  The YAML document below describes versions of all of the packages
+  *directly* used by PISM, ibmisc, IceBin, and ModelE. Except for
+  =curl=. We need =curl= because ModelE seems to think that we need
+  libcurl if a HDF5 library is located in the same directory as the
+  NetCDF library.
+
+  Note that PISM does not support the PROJ version required by IceBin.
+  This is not a problem because we can easily disable this part of
+  PISM (it is just a convenience).
+
+#+name: spack-yaml
+#+begin_src yaml
+  # This is a Spack Environment file.
+  #
+  # It describes a set of packages to be installed, along with
+  # configuration settings.
+  spack:
+    # add package specs to the `specs` list
+    specs:
+    - openmpi@4.1.5
+    # Disable fancy PETSc variants
+    - petsc@3.19.1+double~fortran~hdf5~hypre~metis+mpi+shared
+    ## PISM dependencies
+    - fftw@3.3.10~mpi precision=double
+    - gsl@2.7.1
+    - netcdf-c@4.9.2
+    - udunits@2.2.28
+    ## IceBin, ibmisc, and ModelE dependencies
+    - python@3.10.10
+    - py-numpy@1.24.3
+    - py-cython@0.29.33
+    # Some of these Boost libraries are used in IceBin, some others in CGAL.
+    - boost@1.82.0+container+date_time+exception+filesystem+math+mpi+program_options+random+regex+serialization+system+thread
+    - cgal@5.4.1
+    - curl@8.0.1
+    - eigen@3.3.1
+    - everytrace@0.2.2
+    - gmp@6.2.1
+    - googletest@1.12.1
+    - mpfr@4.2.0
+    - netcdf-cxx4@4.3.1
+    - netcdf-fortran@4.6.0
+    # PnetCDF should not be needed, but some ModelE builds depend on it
+    - parallel-netcdf@1.12.3~cxx+fortran
+    # Use an old PROJ version: IceBin uses the old API
+    - proj@4.9.2
+    - tclap@1.2.2
+    - zlib@1.2.13
+    view: true
+    concretizer:
+      # this will ensure the reuse of dependencies
+      unify: true
+#+end_src
+
+Now we can install all these by running
+#+name: spack-install-packages
+#+begin_src bash
+# Install all the packages listed in spack.yaml
+. ~/spack/share/spack/setup-env.sh && spack env activate ~/pism-modele-env
+spack install
+#+end_src
+
+* Install Blitz++
+
+The Spack package =blitz= is broken and I don't want to wait for them
+to fix it. See https://github.com/spack/spack/pull/26587
+
+#+name: install-blitz
+#+begin_src bash
+  #!/bin/bash
+
+  set -e
+  set -u
+  set -x
+
+  prefix=~/local/blitz
+
+  # Install Blitz
+  git clone -b 1.0.2 https://github.com/blitzpp/blitz.git ~/blitz
+  mkdir -p ~/blitz/build
+
+  cmake -S ~/blitz \
+        -B ~/blitz/build \
+        -DCMAKE_INSTALL_PREFIX=${prefix} \
+        -DCMAKE_BUILD_TYPE=Release;
+
+  make -C ~/blitz/build install
+  rm -rf ~/blitz
+#+end_src
+
+* Create a file system "view" of several packages
+
+  At least one of the build systems cannot find dependencies provided
+  by Spack. Here we creates symbolic links to work around this issue.
+
+#+name: create-symlinks
+#+begin_src bash
+  #!/bin/bash
+  # Set up symlinks to work around some build system issues
+
+  . ~/spack/share/spack/setup-env.sh && spack env activate ~/pism-modele-env
+
+  spack view symlink ~/local/spack \
+        curl \
+        netcdf-c \
+        netcdf-cxx4 \
+        netcdf-fortran \
+        openmpi \
+        parallel-netcdf \
+        udunits \
+    ;
+#+end_src
+
+* Finishing touches
+
+- We need to set up Spack in =.bashrc=.
+- We bind PISM's sources to =/opt/pism=. PISM's build system runs
+  =git= to determine the version of PISM we're building and we need to
+  tell Git that =/opt/pism= is safe.
+- We need to tell ModelE where to look for the IceBin library at runtime.  
+
+#+name: git-and-bash-setup
+#+begin_src bash
+  #!/bin/bash
+
+  # Tell Git that /opt/pism is safe (used by PISM's build system to get PISM's version)
+  git config --global --add safe.directory /opt/pism
+  # Set up Spack
+  echo ". ~/spack/share/spack/setup-env.sh" >> ~/.bashrc
+  # Activate the environment
+  echo "spack env activate ~/pism-modele-env" >> ~/.bashrc
+  # Tell everyone where libicebin.so is (needed to run ModelE with icebin)
+  echo "export LD_LIBRARY_PATH=$HOME/local/icebin/lib" >> ~/.bashrc
+  # Start $HOME.
+  echo "cd ~" >> ~/.bashrc
+#+end_src
+
+* Complete Dockerfile
+
+#+begin_src dockerfile :tangle Dockerfile :noweb yes :results none
+  FROM ubuntu:22.04
+
+  RUN <<EOF
+  <<basic-dev-environment>>
+  EOF
+
+  # Add a user: we don't need to do anything else as root.
+  RUN useradd --create-home --system --shell=/bin/false builder && usermod --lock builder
+  USER builder
+
+  # Install spack
+  RUN <<EOF
+  <<install-spack>>
+  EOF
+
+  COPY <<EOF /home/builder/pism-modele-env/spack.yaml
+  <<spack-yaml>>
+  EOF
+
+  RUN <<EOF
+  <<spack-install-packages>>
+  EOF
+
+  RUN <<EOF
+  <<install-blitz>>
+  EOF
+
+  run <<EOF
+  exit
+  <<create-symlinks>>
+  EOF
+
+  RUN <<EOF
+  <<git-and-bash-setup>>
+  EOF
+#+end_src
+

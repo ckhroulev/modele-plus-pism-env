@@ -21,8 +21,11 @@ run: build
 		${IMAGE} \
 		bash
 
-build:
+build: Dockerfile
 	docker build -t ${IMAGE} .
 
 stage:
 	${MAKE} -C modele_staging clean container
+
+Dockerfile: docker.org
+	emacs --batch -l org $^ -f org-babel-tangle
