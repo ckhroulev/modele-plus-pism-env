@@ -6,9 +6,9 @@
   _might_, though.
 
   Note that =python3= is needed to run Spack and =python2= is needed
-  to build IceBin (=ibmisc= has a Python 2.x script that generates
-  some code). Spack no longer supports Python 2.x, so this has to come
-  from a system package.
+  to build IceBin (=ibmisc= contains a Python 2.x script that
+  generates some code). Spack no longer supports Python 2.x, so this
+  has to come from a system package.
 
   Some of these packages are very much optional.
 
@@ -137,7 +137,7 @@ spack install
 * Install Blitz++
 
 The Spack package =blitz= is broken and I don't want to wait for them
-to fix it. See https://github.com/spack/spack/pull/26587
+to fix it. See https://github.com/spack/spack/pull/26587.
 
 #+name: install-blitz
 #+begin_src bash
@@ -160,8 +160,9 @@ rm -rf ~/blitz
 
 * Create a file system "view" of several packages
 
-  At least one of the build systems cannot find dependencies provided
-  by Spack. Here we creates symbolic links to work around this issue.
+  At least one of the build systems (IceBin and ModelE) cannot find
+  dependencies provided by Spack. Here we create symbolic links to
+  work around this issue.
 
 #+name: create-symlinks
 #+begin_src bash
@@ -299,8 +300,10 @@ We build ibmisc from sources because
 - we may need to use a custom version of it, or modify some code
 
 *** ibmisc
+
 Note that we disable compiler warnings: using =-w=: there are too
 many.
+
 #+name: build-ibmisc
 #+begin_src bash :tangle build-ibmisc.sh
 #!/bin/bash
@@ -335,7 +338,6 @@ Consider removing =-Wno-dev= and cleaning up the build system.
   netCDF-C++ headers
 - IceBin assumes that UDUNITS headers are somewhere obvious (e.g. the
   same place as some other headers it uses)
-
 
 #+name: build-icebin
 #+begin_src bash :tangle build-icebin.sh
@@ -383,7 +385,9 @@ This is the rundeck file. I had to modify it a bit to
 - remove a C-style comment =/* needed for "Ent" only */= that led to a
   confusing error.
 
-I am not sure this rundeck is correct.
+#+begin_quote
+*I am not sure this rundeck is correct.*
+#+end_quote
 
 *** rundeck
 
