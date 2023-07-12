@@ -5,18 +5,18 @@ ICEBIN_DIR ?= ${PWD}/../icebin
 PISM_DIR ?= ${PWD}/../pism
 MODELE_DIR ?= ${PWD}/../modelE
 
-MODELE_STAGING_DIR ?= ${PWD}/modele_staging
-SCRIPTS_DIR ?= ${PWD}/scripts
+MODELE_DATA_DIR ?= ${PWD}/modele_staging
+SCRIPTS_DIR ?= ${PWD}
 
-run: build
+run: build build-pism.sh build-ibmisc.sh build-icebin.sh build-modele.sh run-modele.sh
 	docker run \
 		--rm \
 		-it \
 		-v ${ICEBIN_DIR}:/opt/icebin -e ICEBIN_DIR=/opt/icebin \
 		-v ${IBMISC_DIR}:/opt/ibmisc -e IBMISC_DIR=/opt/ibmisc \
-		-v ${PISM_DIR}:/opt/pism -e PISM_DIR=/opt/pism \
+		-v ${PISM_DIR}:/opt/pism     -e PISM_DIR=/opt/pism \
 		-v ${MODELE_DIR}:/opt/modele -e MODELE_DIR=/opt/modele \
-		-v ${MODELE_STAGING_DIR}:/opt/modele_staging -e MODELE_STAGING_DIR=/opt/modele_staging \
+		-v ${MODELE_DATA_DIR}:/opt/modele_data -e MODELE_DATA_DIR=/opt/modele_data \
 		-v ${SCRIPTS_DIR}:/opt/scripts -e SCRIPTS_DIR=/opt/scripts \
 		${IMAGE} \
 		bash
@@ -27,5 +27,5 @@ build: Dockerfile
 stage:
 	${MAKE} -C modele_staging clean container
 
-Dockerfile: docker.org
-	emacs --batch -l org $^ -f org-babel-tangle
+Dockerfile build-pism.sh build-ibmisc.sh build-icebin.sh build-modele.sh run-modele.sh: docker.org
+	emacs -Q --batch -l org $^ -f org-babel-tangle

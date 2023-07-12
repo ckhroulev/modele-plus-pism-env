@@ -249,3 +249,186 @@ to fix it. See https://github.com/spack/spack/pull/26587
   EOF
 #+end_src
 
+* Building PISM, IceBin, ModelE
+
+** Building PISM
+
+#+name: build-pism
+#+begin_src bash :tangle build-pism.sh
+  #!/bin/bash
+
+  set -e
+  set -u
+  set -x
+
+  # The variable PISM_DIR should point to PISM's source tree.
+
+  PREFIX=$HOME/local/pism
+  BUILD_DIR=$HOME/build/pism
+
+  mkdir -p ${BUILD_DIR}
+  rm -f ${BUILD_DIR}/CMakeCache.txt
+
+  export CC=mpicc
+  export CXX=mpicxx
+
+  cmake -S ${PISM_DIR} -B ${BUILD_DIR} \
+    -DCMAKE_INSTALL_PREFIX=${PREFIX} \
+    -DPism_USE_EVERYTRACE=TRUE \
+    -DPism_BUILD_ICEBIN=TRUE \
+    -DCMAKE_BUILD_TYPE=Debug \
+    ;
+
+  make -j -C ${BUILD_DIR} install
+
+#+end_src
+
+** Building ibmisc and IceBin
+
+We build ibmisc from sources because
+- it depends on Blitz++, which we (currently) cannot install via Spack
+- we may need to use a custom version of it, or modify some code
+
+*** ibmisc
+Note that we disable compiler warnings: using =-w=: there are too
+many.
+#+name: build-ibmisc
+#+begin_src bash :tangle build-ibmisc.sh
+  #!/bin/bash
+
+  set -e
+  set -x
+  set -u
+
+  BUILD_DIR=~/local/build/ibmisc
+  PREFIX=$HOME/local/ibmisc
+
+  mkdir -p ${BUILD_DIR}
+  rm -f ${BUILD_DIR}/CMakeCache.txt
+
+  cmake -S ${IBMISC_DIR} -B ${BUILD_DIR} \
+        -DCMAKE_INSTALL_PREFIX=${PREFIX} \
+        -DCMAKE_BUILD_TYPE=Debug \
+        -DCMAKE_FIND_ROOT_PATH=~/local/blitz \
+        -DCMAKE_CXX_FLAGS="-fpermissive -w" \
+    ;
+
+  make -j -C ${BUILD_DIR} install
+
+#+end_src
+
+*** IceBin
+
+#+begin_quote
+Consider removing =-Wno-dev= and cleaning up the build system.
+#+end_quote
+
+#+name: build-icebin
+#+begin_src bash :tangle build-icebin.sh
+  #!/bin/bash
+
+  set -e
+  set -x
+  set -u
+
+  BUILD_DIR=~/local/build/icebin
+  PREFIX=$HOME/local/icebin
+
+  mkdir -p ${BUILD_DIR}
+  rm -f ${BUILD_DIR}/CMakeCache.txt
+
+  # ibmisc headers are full of these...
+  IGNORED_WARNINGS="-Wno-ignored-attributes -Wno-narrowing -Wno-vexing-parse -Wno-return-type -Wno-deprecated-declarations -Wno-format"
+
+  # prefixes to use when looking for dependencies (have to be absolute paths; don't use ~)
+  PREFIXES="$HOME/local/blitz;$HOME/local/ibmisc;$HOME/local/spack;$HOME/local/pism"
+
+  cmake -S ${ICEBIN_DIR} -B ${BUILD_DIR} \
+        -DCMAKE_INSTALL_PREFIX=${PREFIX} \
+        -DCMAKE_CXX_FLAGS="${IGNORED_WARNINGS}" \
+        -DCMAKE_BUILD_TYPE=Debug \
+        -DCGAL_DO_NOT_WARN_ABOUT_CMAKE_BUILD_TYPE=TRUE \
+        -DCMAKE_PREFIX_PATH=${PREFIXES} \
+        -DUSE_PISM=TRUE \
+        -DBUILD_MODELE=TRUE \
+        -Wno-dev \
+    2>&1 | tee ${BUILD_DIR}/configure.log
+
+  make -j -C ${BUILD_DIR} install
+#+end_src
+
+** ModelE
+
+#+name: build-modele.sh
+#+begin_src bash :tangle build-modele.sh
+  #!/bin/bash
+
+  set -x
+  set -e
+  set -u
+
+  echo "Using ModelE in ${MODELE_DIR} and data in ${MODELE_DATA_DIR}..."
+
+  MODELE_BUILD=~/local/modele
+  MODELE_SUPPORT=~/modele-support
+
+  rm -rf ${MODELE_BUILD}
+  mkdir -p ${MODELE_BUILD}
+  # make a copy of ModelE sources to simulate "out of source" building
+  cp -r ${MODELE_DIR}/* ${MODELE_BUILD}
+
+  cd ${MODELE_BUILD}/decks
+
+  # remove and re-create the "support" directory
+  rm -rf ${MODELE_SUPPORT}
+  make config ModelE_Support=${MODELE_SUPPORT} SHELL=/bin/bash OVERWRITE=YES
+
+  # set compiler and MPI parameters
+  echo "COMPILER=gfortran" >> ~/.modelErc
+  echo "MPIDISTR=openmpi" >> ~/.modelErc
+  echo "MPIDIR=$HOME/local/spack" >> ~/.modelErc
+
+  # create symlinks
+  rm -rf ${MODELE_SUPPORT}/prod_input_files/
+  ln -s ${MODELE_DATA_DIR}/prod_input_files/ ${MODELE_SUPPORT}/
+
+  RUNNAME=r01
+
+  cp ${MODELE_DATA_DIR}/rundeck.R ./${RUNNAME}.R
+
+  make -j setup \
+    RUN=${RUNNAME}  \
+    MPI=YES \
+    COMPILE_WITH_TRAPS=NO \
+    NETCDFHOME=$HOME/local/spack \
+    PNETCDFHOME=$HOME/local/spack \
+    LILIBSDIR=$HOME/local/icebin \
+    EXTRA_FFLAGS="-O0 -ggdb3 -fwrapv -fallow-argument-mismatch -fallow-invalid-boz" \
+    EXTRA_LFLAGS="-O0 -ggdb3"  \
+    2>&1 | tee ${MODELE_BUILD}/${RUNNAME}.compile.log
+
+  # generate the icebin.nc config file
+  mkdir -p ${RUNNAME}/config
+  export INPUT_DIR=${MODELE_SUPPORT}/prod_input_files/inputs
+  export OUTPUT_DIR=${MODELE_SUPPORT}/huge_space/${RUNNAME}
+  cat ${MODELE_DATA_DIR}/icebin.cdl.template | \
+    envsubst | \
+    ncgen -o ${RUNNAME}/config/icebin.nc -
+  unset INPUT_DIR
+  unset OUTPUT_DIR
+#+end_src
+
+* Running ModelE
+
+#+name: run-modele
+#+begin_src bash :tangle run-modele.sh
+  #!/bin/bash
+
+  rm -f ~/modele-support/prod_runs/r01/lock
+
+  pushd ~/local/modele/decks
+
+  DEBUG_COMMAND="gdb --args" ../exec/runE r01 -d -cold-restart
+
+  popd
+#+end_src
