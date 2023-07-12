@@ -331,6 +331,12 @@ make -j -C ${BUILD_DIR} install
 Consider removing =-Wno-dev= and cleaning up the build system.
 #+end_quote
 
+- IceBin assumes that =netcdf.h= is installed in the same location as
+  netCDF-C++ headers
+- IceBin assumes that UDUNITS headers are somewhere obvious (e.g. the
+  same place as some other headers it uses)
+
+
 #+name: build-icebin
 #+begin_src bash :tangle build-icebin.sh
 #!/bin/bash
@@ -827,22 +833,52 @@ popd
 
 Here's how to use this:
 
-Either clone or symlink repositories to get this directory structure:
+Create copies (or use symlinks) to create this directory structure.
 
-#+begin_src bash
-find . -maxdepth 2 \( -name .git -prune \) -o -type l -o -type d
+#+begin_src bash :results output :exports results
+find -L . -maxdepth 1 -not -name .git -type d
+find -L ./modele_data -type d
+find -L ./modele_data/prod_input_files/inputs -type f
 #+end_src
 
 #+RESULTS:
-| 0                              |
-| ./ibmisc                       |
-| ./.#notes.org                  |
-| ./modele_data                  |
-| ./modele_data/prod_input_files |
-| ./icebin                       |
-| ./.git                         |
-| ./pism                         |
-  
+#+begin_example
+.
+./modelE
+./ibmisc
+./modele_data
+./icebin
+./pism
+./modele_data
+./modele_data/prod_input_files
+./modele_data/prod_input_files/cmip6_nint_inputs_E14TomaOCNf10_4av_decadal
+./modele_data/prod_input_files/cmip6_nint_inputs_E14TomaOCNf10_4av_decadal/SSA
+./modele_data/prod_input_files/cmip6_nint_inputs_E14TomaOCNf10_4av_decadal/BCB
+./modele_data/prod_input_files/cmip6_nint_inputs_E14TomaOCNf10_4av_decadal/O3
+./modele_data/prod_input_files/cmip6_nint_inputs_E14TomaOCNf10_4av_decadal/BCdalbsn
+./modele_data/prod_input_files/cmip6_nint_inputs_E14TomaOCNf10_4av_decadal/OCA
+./modele_data/prod_input_files/cmip6_nint_inputs_E14TomaOCNf10_4av_decadal/DUST
+./modele_data/prod_input_files/cmip6_nint_inputs_E14TomaOCNf10_4av_decadal/BCA
+./modele_data/prod_input_files/cmip6_nint_inputs_E14TomaOCNf10_4av_decadal/SUL
+./modele_data/prod_input_files/cmip6_nint_inputs_E14TomaOCNf10_4av_decadal/NIT
+./modele_data/prod_input_files/inputs
+./modele_data/prod_input_files/inputs/pism_Greenland_5km_v1.1.nc
+./modele_data/prod_input_files/inputs/g20km_10ka.nc
+./modele_data/prod_input_files/inputs/global_ecO_ng.nc
+./modele_data/prod_input_files/inputs/topoa.nc
+./modele_data/prod_input_files/inputs/gcmO.nc
+./modele_data/prod_input_files/inputs/topoo_ng.nc
+./modele_data/prod_input_files/inputs/GIC
+#+end_example
+
+To build and run the container, run =make build run=. To use the
+container I uploaded to docker hub, do =make run=.
+
+Once in the container, build all the pieces by running
+=$TOOLS_DIR/build-all.sh=.
+
+To try running ModelE+IceBin+PISM, run =$TOOLS_DIR/run-modele.sh=.
+
 #+begin_src makefile :tangle rules.mk
 IMAGE=ckhrulev/icebin-env:0.0.1
 
@@ -857,7 +893,7 @@ TOOLS_DIR ?= ${PWD}
 SCRIPTS=build-all.sh build-pism.sh build-ibmisc.sh build-icebin.sh build-modele.sh run-modele.sh
 GENERATED=${SCRIPTS} icebin.cdl.template rundeck.R Dockerfile
 
-run: build scripts
+run: scripts
 	docker run \
 		--rm \
 		-it \
@@ -876,7 +912,10 @@ build: Dockerfile
 scripts: ${SCRIPTS}
 	chmod a+x ${SCRIPTS}
 
-${GENERATED}: notes.org
+${GENERATED}: tangle
+	emacs -Q --batch -l org $^ -f org-babel-tangle
+
+tangle: notes.org
 	emacs -Q --batch -l org $^ -f org-babel-tangle
 
 clean:
