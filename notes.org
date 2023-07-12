@@ -845,7 +845,7 @@ TOOLS_DIR ?= ${PWD}
 SCRIPTS=build-all.sh build-pism.sh build-ibmisc.sh build-icebin.sh build-modele.sh run-modele.sh
 GENERATED=${SCRIPTS} icebin.cdl.template rundeck.R Dockerfile
 
-run: build ${SCRIPTS}
+run: build scripts
 	docker run \
 		--rm \
 		-it \
@@ -861,12 +861,11 @@ run: build ${SCRIPTS}
 build: Dockerfile
 	docker build -t ${IMAGE} .
 
-stage:
-	${MAKE} -C modele_staging clean container
+scripts: ${SCRIPTS}
+	chmod a+x ${SCRIPTS}
 
 ${GENERATED}: notes.org
 	emacs -Q --batch -l org $^ -f org-babel-tangle
-	chmod a+x ${SCRIPTS}
 
 clean:
 	@rm -f ${GENERATED}
