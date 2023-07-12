@@ -141,11 +141,7 @@ to fix it. See https://github.com/spack/spack/pull/26587
 
 #+name: install-blitz
 #+begin_src bash
-#!/bin/bash
-
-set -e
-set -u
-set -x
+# Install Blitz++
 
 prefix=~/local/blitz
 
@@ -169,7 +165,6 @@ rm -rf ~/blitz
 
 #+name: create-symlinks
 #+begin_src bash
-#!/bin/bash
 # Set up symlinks to work around some build system issues
 
 . ~/spack/share/spack/setup-env.sh && spack env activate ~/pism-modele-env
@@ -195,7 +190,7 @@ spack view symlink ~/local/spack \
 
 #+name: git-and-bash-setup
 #+begin_src bash
-#!/bin/bash
+# Final touches
 
 # Tell Git that /opt/pism is safe (used by PISM's build system to get PISM's version)
 git config --global --add safe.directory /opt/pism
@@ -240,7 +235,6 @@ RUN <<EOF
 EOF
 
 run <<EOF
-exit
 <<create-symlinks>>
 EOF
 
@@ -829,15 +823,33 @@ DEBUG_COMMAND="gdb --args" ../exec/runE r01 -d -cold-restart
 popd
 #+end_src
 
-* Makefile driving all this
+* The Makefile driving all this
 
+Here's how to use this:
+
+Either clone or symlink repositories to get this directory structure:
+
+#+begin_src bash
+find . -maxdepth 2 \( -name .git -prune \) -o -type l -o -type d
+#+end_src
+
+#+RESULTS:
+| 0                              |
+| ./ibmisc                       |
+| ./.#notes.org                  |
+| ./modele_data                  |
+| ./modele_data/prod_input_files |
+| ./icebin                       |
+| ./.git                         |
+| ./pism                         |
+  
 #+begin_src makefile :tangle rules.mk
 IMAGE=ckhrulev/icebin-env:0.0.1
 
-IBMISC_DIR ?= ${PWD}/../ibmisc
-ICEBIN_DIR ?= ${PWD}/../icebin
-PISM_DIR ?= ${PWD}/../pism
-MODELE_DIR ?= ${PWD}/../modelE
+IBMISC_DIR ?= ${PWD}/ibmisc
+ICEBIN_DIR ?= ${PWD}/icebin
+PISM_DIR ?= ${PWD}/pism
+MODELE_DIR ?= ${PWD}/modelE
 
 MODELE_DATA_DIR ?= ${PWD}/modele_data
 TOOLS_DIR ?= ${PWD}
