@@ -111,6 +111,7 @@ spack:
   - everytrace@0.2.2
   - gmp@6.2.1
   - googletest@1.12.1
+  - m4@1.4.19
   - mpfr@4.2.0
   - netcdf-cxx4@4.3.1
   - netcdf-fortran@4.6.0
