@@ -253,7 +253,7 @@ set -e
 set -x
 set -u
 
-pushd $SCRIPTS_DIR
+pushd $TOOLS_DIR
 ./build-pism.sh
 ./build-ibmisc.sh
 ./build-icebin.sh
@@ -794,7 +794,7 @@ ln -s ${MODELE_DATA_DIR}/prod_input_files/ ${MODELE_SUPPORT}/
 
 RUNNAME=r01
 
-cp ${MODELE_DATA_DIR}/rundeck.R ./${RUNNAME}.R
+cp ${TOOLS_DIR}/rundeck.R ./${RUNNAME}.R
 
 make -j setup \
   RUN=${RUNNAME}  \
@@ -811,7 +811,7 @@ make -j setup \
 mkdir -p ${RUNNAME}/config
 export INPUT_DIR=${MODELE_SUPPORT}/prod_input_files/inputs
 export OUTPUT_DIR=${MODELE_SUPPORT}/huge_space/${RUNNAME}
-cat ${MODELE_DATA_DIR}/icebin.cdl.template | \
+cat ${TOOLS_DIR}/icebin.cdl.template | \
   envsubst | \
   ncgen -o ${RUNNAME}/config/icebin.nc -
 unset INPUT_DIR
