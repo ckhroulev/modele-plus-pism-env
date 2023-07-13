@@ -924,7 +924,6 @@ tangle: notes.org
 
 clean:
 	@rm -f ${GENERATED}
-	@rm -f rules.mk
 #+end_src
 
 # Note: we have to set org-src-preserve-indentation to be able to use
