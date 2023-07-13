@@ -83,7 +83,7 @@ spack env create -d ~/pism-modele-env
   PISM (it is just a convenience).
 
 #+name: spack-yaml
-#+begin_src yaml
+#+begin_src yaml :tangle spack.yaml
 # This is a Spack Environment file.
 #
 # It describes a set of packages to be installed, along with
