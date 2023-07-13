@@ -141,8 +141,9 @@ The Spack package =blitz= is broken and I don't want to wait for them
 to fix it. See https://github.com/spack/spack/pull/26587.
 
 #+name: install-blitz
-#+begin_src bash
+#+begin_src bash :tangle build-blitz.sh
 # Install Blitz++
+#!/bin/bash
 
 prefix=~/local/blitz
 
