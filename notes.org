@@ -919,7 +919,6 @@ scripts: ${SCRIPTS}
 	chmod a+x ${SCRIPTS}
 
 ${GENERATED}: tangle
-	emacs -Q --batch -l org $^ -f org-babel-tangle
 
 tangle: notes.org
 	emacs -Q --batch -l org $^ -f org-babel-tangle
