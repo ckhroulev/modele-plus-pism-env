@@ -57,7 +57,7 @@ rm -rf /var/lib/apt/lists/*
   (most likely GNU).
   
 #+name: install-spack
-#+begin_src bash
+#+begin_src bash :tangle install-spack.sh
 # Install spack 0.20
 git clone --depth=100 --branch=releases/v0.20 https://github.com/spack/spack.git ~/spack
 
