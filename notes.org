@@ -97,7 +97,7 @@ spack:
   ## PISM dependencies
   - fftw@3.3.10~mpi precision=double
   - gsl@2.7.1
-  - netcdf-c@4.9.2
+  - netcdf-c@4.9.2+mpi~blosc~szip~zstd
   - udunits@2.2.28
   ## IceBin, ibmisc, and ModelE dependencies
   - python@3.10.10
