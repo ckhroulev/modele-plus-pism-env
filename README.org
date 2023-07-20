@@ -1,0 +1,38 @@
+This repository contains notes documenting my attempt to create a
+Docker container with the environment that can be used to build GISS
+ModelE coupled to PISM via IceBin.
+
+It appears to "work" with
+
+- The =dev= branch of PISM [[https://github.com/pism/pism][github.com/pism/pism]] (as of <2023-07-20>)
+- The =ckhrulev/pism-dev-2023-07= branch of
+  [[https://github.com/ckhroulev/icebin][github.com/ckhroulev/icebin.]]
+- The current code in [[https://github.com/NASA-GISS/modelE][github.com/NASA-GISS/modelE]] (as of <2023-07-20>).
+- The =ckhrulev/ignore-compression-failres= branch of
+  [[https://github.com/ckhroulev/ibmisc][github.com/ckhroulev/ibmisc]].
+
+Right now the code compiles... but the run crashes with an error
+message:
+
+#+begin_example
+#+end_example
+
+* Building the Docker image
+
+Run =make build= in this directory.
+
+* Using the image to build and run coupled code
+
+- Create symbolic links or copy =modelE=, =ibmisc=, =icebin= and
+  =pism= source code into this directory.
+
+- Create a symbolic link =modele_data= pointing to the directory that
+  contains =prod_input_files=, =prod_input_files/inputs=, etc.
+
+- Run =make run=
+
+- Run =$TOOLS_DIR/build-all.sh= to build =ibmisc=, =icebin=, =pism=,
+  =ModelE=.
+
+- Run =$TOOLS_DIR/run-modele.sh= to run ModelE+PISM in =gdb= (for
+  debugging).
