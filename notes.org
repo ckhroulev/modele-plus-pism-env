@@ -896,8 +896,8 @@ MODELE_DIR ?= ${PWD}/modelE
 MODELE_DATA_DIR ?= ${PWD}/modele_data
 TOOLS_DIR ?= ${PWD}
 
-SCRIPTS=build-all.sh build-pism.sh build-ibmisc.sh build-icebin.sh build-modele.sh run-modele.sh
-GENERATED=${SCRIPTS} icebin.cdl.template rundeck.R Dockerfile
+SCRIPTS=install-spack.sh build-all.sh build-pism.sh build-ibmisc.sh build-icebin.sh build-modele.sh build-blitz.sh run-modele.sh
+GENERATED=${SCRIPTS} icebin.cdl.template rundeck.R Dockerfile spack.yaml
 
 run: scripts
 	docker run \
@@ -920,6 +920,7 @@ scripts: ${SCRIPTS}
 
 ${GENERATED}: tangle
 
+.PHONY: tangle
 tangle: notes.org
 	emacs -Q --batch -l org $^ -f org-babel-tangle
 
