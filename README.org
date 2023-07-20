@@ -8,13 +8,47 @@ It appears to "work" with
 - The =ckhrulev/pism-dev-2023-07= branch of
   [[https://github.com/ckhroulev/icebin][github.com/ckhroulev/icebin.]]
 - The current code in [[https://github.com/NASA-GISS/modelE][github.com/NASA-GISS/modelE]] (as of <2023-07-20>).
-- The =ckhrulev/ignore-compression-failres= branch of
+- The =ckhrulev/ignore-compression-failures= branch of
   [[https://github.com/ckhroulev/ibmisc][github.com/ckhroulev/ibmisc]].
 
 Right now the code compiles... but the run crashes with an error
 message:
 
 #+begin_example
+ERROR: (48, 86): sum(FHC) = 0.999283
+_EVERYTRACE_ DUMP: (retcode=-1) Errors in TOPO merging or regridding; halting!
+END make_topoA
+#0  0x7fd1495ffad0 in ???
+#1  0x7fd148baf75e in ???
+#2  0x7fd148baf7ba in ???
+#3  0x7fd148baf953 in ???
+#4  0x7fd14a3afadc in icebin::modele::GCMCoupler_ModelE::update_topo(double, bool, std::vector<blitz::Array<double, 1>, std::allocator<blitz::Array<double, 1> > > const&, std::vector<blitz::Array<double, 1>, std::allocator<blitz::Array<double, 1> > > const&, icebin::GCMInput&, spsparse::TupleList<long, double, 1>&)
+	at /opt/icebin/slib/icebin/modele/GCMCoupler_ModelE.cpp:1177
+#5  0x7fd14a3b15ef in icebin::modele::GCMCoupler_ModelE::couple(double, icebin::VectorMultivec const&, bool)
+	at /opt/icebin/slib/icebin/modele/GCMCoupler_ModelE.cpp:1301
+#6  0x7fd14a3acfb5 in gcmce_couple_native
+	at /opt/icebin/slib/icebin/modele/GCMCoupler_ModelE.cpp:857
+#7  0x7fd14a3ac23f in gcmce_model_start
+	at /opt/icebin/slib/icebin/modele/GCMCoupler_ModelE.cpp:670
+#8  0x5631c8bc6009 in __lisheeticebin_mod_MOD_cold_start
+	at /home/builder/local/modele/model/LISheetIceBin.F90:544
+#9  0x5631c8bba17c in __lisnow_mod_MOD_cold_start
+	at /home/builder/local/modele/model/LISnow.F90:429
+#10  0x5631c89e5f8a in init_li_
+	at /home/builder/local/modele/model/LANDICE_DRV.f:89
+#11  0x5631c88fb240 in input_atm_
+	at /home/builder/local/modele/model/ATM_DRV.f:738
+#12  0x5631c88df65b in input_
+	at /home/builder/local/modele/model/MODELE.f:1447
+#13  0x5631c88e2171 in giss_modele_
+	at /home/builder/local/modele/model/MODELE.f:266
+#14  0x5631c88dafc8 in modele_maindriver_
+	at /home/builder/local/modele/model/MODELE_DRV.f:27
+#15  0x5631c87fbd36 in MAIN__
+	at /home/builder/local/modele/model/main.F90:11
+#16  0x5631c87fbd7c in main
+	at /home/builder/local/modele/model/main.F90:13
+Errors in TOPO merging or regridding; halting!
 #+end_example
 
 * Building the Docker image
